@@ -1,0 +1,15 @@
+<script setup>
+import headerBg from '../../assets/img/header-bg.jpg'
+</script>
+
+<template>
+  <header class="masthead" :style="{ backgroundImage: `url(${headerBg})` }">
+    <div class="container">
+      <div class="intro-text">
+        <div class="intro-lead-in"><span>Welcome To Our Studio!</span></div>
+        <div class="intro-heading text-uppercase"><span>It's Nice To Meet You</span></div>
+        <a class="btn btn-primary btn-xl text-uppercase" role="button" href="#services">Tell mE more</a>
+      </div>
+    </div>
+  </header>
+</template>
