@@ -12,20 +12,7 @@ const navItems = [
   { href: '#contact', label: 'Contact' },
 ]
 
-const handleScroll = () => {
-  if (!mainNav.value) return
-  
-  if (window.scrollY > 100) {
-    mainNav.value.classList.add("navbar-shrink")
-  } else {
-    mainNav.value.classList.remove("navbar-shrink")
-  }
-}
-
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-  handleScroll() // Check initial state
-  
   const navbarCollapse = mainNav.value.querySelector('.navbar-collapse')
   if (navbarCollapse) {
     const navbarItems = navbarCollapse.querySelectorAll('a')
@@ -38,14 +25,10 @@ onMounted(() => {
     }
   }
 })
-
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg fixed-top bg-dark navbar-dark" id="mainNav" ref="mainNav">
+  <nav class="navbar navbar-expand-lg fixed-top bg-dark navbar-dark navbar-shrink" id="mainNav" ref="mainNav">
     <div class="container">
       <BrandLogo />
       <button 

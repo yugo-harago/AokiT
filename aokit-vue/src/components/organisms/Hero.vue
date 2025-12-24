@@ -9,7 +9,7 @@ import BaseButton from '../atoms/BaseButton.vue'
       <div class="intro-text">
         <div class="intro-lead-in"><span>Connecting Japan and the World</span></div>
         <div class="intro-heading"><span>AokiT Inc.</span></div>
-        <BaseButton href="#services">Tell mE more</BaseButton>
+        <BaseButton href="#services">Tell me more</BaseButton>
       </div>
     </div>
   </header>
