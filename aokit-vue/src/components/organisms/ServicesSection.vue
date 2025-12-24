@@ -4,19 +4,19 @@ import ServiceCard from '../molecules/ServiceCard.vue'
 
 const services = [
   {
-    icon: 'shopping-cart',
-    title: 'E-Commerce',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minima maxime quam architecto quo inventore harum ex magni, dicta impedit.'
+    icon: 'plane',
+    title: 'Import & Export',
+    description: 'Facilitating the exchange of food, culture, and products between Japan and the world.'
   },
   {
-    icon: 'laptop',
-    title: 'Responsive Design',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minima maxime quam architecto quo inventore harum ex magni, dicta impedit.'
+    icon: 'cutlery',
+    title: 'Restaurant Business',
+    description: 'Bringing the essence of Japan to local communities through authentic culinary experiences.'
   },
   {
-    icon: 'lock',
-    title: 'Web Security',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minima maxime quam architecto quo inventore harum ex magni, dicta impedit.'
+    icon: 'globe',
+    title: 'Global Hub',
+    description: 'Creating smooth pathways for global exchange and human resources.'
   }
 ]
 </script>

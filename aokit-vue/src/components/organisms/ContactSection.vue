@@ -24,7 +24,7 @@ const submitForm = () => {
         <div class="col-lg-12 text-center">
           <SectionHeading 
             title="Contact Us" 
-            subtitle="Lorem ipsum dolor sit amet consectetur." 
+            subtitle="191910 W Braker Ln #300, Austin Texas 78758" 
           />
         </div>
       </div>

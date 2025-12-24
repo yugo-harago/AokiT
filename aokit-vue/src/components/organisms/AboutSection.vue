@@ -8,30 +8,30 @@ import img4 from '../../assets/img/about/4.jpg'
 
 const timelineItems = [
   {
-    date: '2009-2011',
-    heading: 'Our Humble Beginnings',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!',
+    date: 'November 2025',
+    heading: 'Established',
+    body: 'AokiT Inc. was founded in Austin, Texas, to serve as an international hub connecting Japan and the world.',
     image: img1,
     inverted: false
   },
   {
-    date: 'March 2011',
-    heading: 'An Agency is Born',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!',
+    date: 'Our Mission',
+    heading: 'Connecting Japan & The World',
+    body: 'We facilitate the exchange of food, culture, products, and human resources, bringing the essence of Japan and new value to local communities.',
     image: img2,
     inverted: true
   },
   {
-    date: 'December 2012',
-    heading: 'Transition to Full Service',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!',
+    date: 'Our Positioning',
+    heading: 'Creating Value',
+    body: 'With strong connections to Japan and cross-border business expertise, we prioritize human networks and respect for Japanese food culture.',
     image: img3,
     inverted: false
   },
   {
-    date: 'July 2014',
-    heading: 'Phase Two Expansion',
-    body: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!',
+    date: 'Future',
+    heading: 'Expanding Horizons',
+    body: 'We continue to create smooth pathways for global exchange, leveraging our expertise in real estate, insurance, and import/export operations.',
     image: img4,
     inverted: true
   }
@@ -45,7 +45,7 @@ const timelineItems = [
         <div class="col-lg-12 text-center">
           <SectionHeading 
             title="About" 
-            subtitle="Lorem ipsum dolor sit amet consectetur." 
+            subtitle="Bringing the essence of Japan and new value to local communities." 
           />
         </div>
       </div>

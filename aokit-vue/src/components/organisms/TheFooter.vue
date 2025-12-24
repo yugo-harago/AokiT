@@ -13,7 +13,7 @@ const socialLinks = [
     <div class="container">
       <div class="row">
         <div class="col-md-4">
-          <span class="copyright">Copyright &copy; AokiT 2025</span>
+          <span class="copyright">Copyright &copy; AokiT Inc. 2025</span>
         </div>
         <div class="col-md-4">
           <ul class="list-inline social-buttons">

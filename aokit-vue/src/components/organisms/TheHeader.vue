@@ -1,14 +1,15 @@
 <script setup>
 import headerBg from '../../assets/img/header-bg.jpg'
+import BaseButton from '../atoms/BaseButton.vue'
 </script>
 
 <template>
   <header class="masthead" :style="{ backgroundImage: `url(${headerBg})` }">
     <div class="container">
       <div class="intro-text">
-        <div class="intro-lead-in"><span>Welcome To Our Studio!</span></div>
-        <div class="intro-heading text-uppercase"><span>It's Nice To Meet You</span></div>
-        <a class="btn btn-primary btn-xl text-uppercase" role="button" href="#services">Tell mE more</a>
+        <div class="intro-lead-in"><span>Connecting Japan and the World</span></div>
+        <div class="intro-heading"><span>AokiT Inc.</span></div>
+        <BaseButton href="#services">Tell mE more</BaseButton>
       </div>
     </div>
   </header>

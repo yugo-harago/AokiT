@@ -1,6 +1,7 @@
 <script setup>
 import SectionHeading from '../atoms/SectionHeading.vue'
 import PortfolioItem from '../molecules/PortfolioItem.vue'
+import PortfolioModal from '../molecules/PortfolioModal.vue'
 // Import images
 import img1Thumb from '../../assets/img/portfolio/1-thumbnail.jpg'
 import img2Thumb from '../../assets/img/portfolio/2-thumbnail.jpg'
@@ -50,37 +51,12 @@ const portfolioItems = [
   </section>
 
   <!-- Modals -->
-  <div 
+  <PortfolioModal 
     v-for="item in portfolioItems" 
     :key="`modal-${item.id}`"
-    class="modal fade text-center portfolio-modal" 
-    role="dialog" 
-    tabindex="-1" 
     :id="`portfolioModal${item.id}`"
-  >
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-8 mx-auto">
-              <div class="modal-body">
-                <h2 class="text-uppercase">Project Name</h2>
-                <p class="text-muted item-intro">Lorem ipsum dolor sit amet consectetur.</p>
-                <img class="img-fluid d-block mx-auto" :src="item.full">
-                <p>Use this area to describe your project. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est blanditiis dolorem culpa incidunt minus dignissimos deserunt repellat aperiam quasi sunt officia expedita beatae cupiditate, maiores repudiandae, nostrum, reiciendis facere nemo!</p>
-                <ul class="list-unstyled">
-                  <li>Date: January 2017</li>
-                  <li>Client: Threads</li>
-                  <li>Category: {{ item.category }}</li>
-                </ul>
-                <button class="btn btn-primary" type="button" data-bs-dismiss="modal">
-                  <i class="fa fa-times"></i><span>&nbsp;Close Project</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    :title="item.title"
+    :category="item.category"
+    :image="item.full"
+  />
 </template>
