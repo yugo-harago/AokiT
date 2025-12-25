@@ -14,3 +14,9 @@ import BaseButton from '../atoms/BaseButton.vue'
     </div>
   </header>
 </template>
+
+<style scoped>
+.intro-heading {
+  font-family: 'Alfa Slab One', cursive;
+}
+</style>
