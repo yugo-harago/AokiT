@@ -66,52 +66,61 @@ export default {
         scrollTrigger: {
             trigger: container,
             start: 'top top',
-            end: '+=2000%', // Significantly longer scroll distance for multiple steps
+            end: '+=2500%', // Increased scroll distance slightly for smoother feel
             pin: true,
-            scrub: 1,
+            scrub: 1, // Increased scrub smoothing
             markers: false, 
             onRefresh: () => video.pause()
         }
       })
 
       // --- SEQUENCE START ---
-
-      // 1. INTRO: Fade out Initial Overlay & Title
-      this.timeline.to([overlay, text], { opacity: 0, duration: 1, ease: "none" })
-
-      // 2. VIDEO START: Scrub video a bit to get moving
       const videoDur = video.duration
-      this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 2, ease: "none" })
 
-      // 3. SHOW "SERVICES" TITLE
-      this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" })
-      this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 2, ease: "none" }) // keep moving slightly
-      this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" })
+      // 1. INTRO
+      this.timeline.addLabel("intro")
+      // Video starts moving immediately
+      this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 4, ease: "none" }, "intro")
+      // Overlays fade out while video moves
+      this.timeline.to([overlay, text], { opacity: 0, duration: 2, ease: "none" }, "intro")
 
-      // 4. GLOBAL HUB
-      this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" })
-      this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 4, ease: "none" }) // Slow move
-      this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" })
+      // 2. SERVICES TITLE
+      this.timeline.addLabel("services")
+      this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 4, ease: "none" }, "services")
+      this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" }, "services")
+      this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" }, "services+=3")
+
+      // 3. GLOBAL HUB
+      this.timeline.addLabel("globalHub")
+      this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 6, ease: "none" }, "globalHub")
+      this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" }, "globalHub")
+      this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" }, "globalHub+=5")
+
+      // 4. GAP (No text, just video movement)
+      this.timeline.addLabel("gap")
+      this.timeline.to(video, { currentTime: videoDur * 0.42, duration: 3, ease: "none" }, "gap")
 
       // 5. RESTAURANT BUSINESS
-      this.timeline.to(restaurant, { opacity: 1, duration: 1, ease: "none" })
-      this.timeline.to(video, { currentTime: videoDur * 0.55, duration: 4, ease: "none" }) // Slow move
-      this.timeline.to(restaurant, { opacity: 0, duration: 1, ease: "none" })
+      this.timeline.addLabel("restaurant")
+      this.timeline.to(video, { currentTime: videoDur * 0.55, duration: 6, ease: "none" }, "restaurant")
+      this.timeline.to(restaurant, { opacity: 1, duration: 1, ease: "none" }, "restaurant")
+      this.timeline.to(restaurant, { opacity: 0, duration: 1, ease: "none" }, "restaurant+=5")
 
       // 6. IMPORT & EXPORT
-      this.timeline.to(importExport, { opacity: 1, duration: 1, ease: "none" })
-      this.timeline.to(video, { currentTime: videoDur * 0.75, duration: 4, ease: "none" }) // Slow move
-      this.timeline.to(importExport, { opacity: 0, duration: 1, ease: "none" })
+      this.timeline.addLabel("importExport")
+      this.timeline.to(video, { currentTime: videoDur * 0.75, duration: 6, ease: "none" }, "importExport")
+      this.timeline.to(importExport, { opacity: 1, duration: 1, ease: "none" }, "importExport")
+      this.timeline.to(importExport, { opacity: 0, duration: 1, ease: "none" }, "importExport+=5")
 
       // 7. FINISH VIDEO to TREE & SHOW TREE IMAGE
-      // Scrub quickly to end
-      this.timeline.to(video, { currentTime: videoDur - 0.1, duration: 3, ease: "none" })
-      
-      // Fade in Tree Image (Static Last Frame)
-      this.timeline.to(treeOverlay, { opacity: 1, duration: 1, ease: "none" })
+      this.timeline.addLabel("finish")
+      this.timeline.to(video, { currentTime: videoDur - 0.1, duration: 4, ease: "none" }, "finish")
+      // Fade in Tree Image at the end of the video movement
+      this.timeline.to(treeOverlay, { opacity: 1, duration: 1, ease: "none" }, "finish+=3")
 
       // 8. SHOW FINAL SLOGAN
-      this.timeline.to(finalSlogan, { opacity: 1, y: 0, duration: 2, ease: "power2.out" })
+      this.timeline.addLabel("slogan")
+      this.timeline.to(finalSlogan, { opacity: 1, y: 0, duration: 2, ease: "power2.out" }, "slogan")
       
       // Hold for a moment
       this.timeline.to({}, { duration: 2 })
@@ -231,7 +240,7 @@ export default {
     font-size: 5rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: #fed136; /* Brand color idea */
+    color: #ffffff;
 }
 
 .card-title {
