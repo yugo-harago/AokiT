@@ -2,6 +2,7 @@
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mp4'
+import treeImage from '../../assets/img/Planet/Tree.jpg'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -10,11 +11,12 @@ export default {
   data() {
     return {
       planetVideo,
+      treeImage,
       isInitialized: false
     }
   },
   created() {
-    this.timeline = null // Initialize as non-reactive property
+    this.timeline = null
   },
   mounted() {
     const video = this.$refs.videoRef
@@ -41,26 +43,30 @@ export default {
       const container = this.$refs.containerRef
       const overlay = this.$refs.overlayRef
       const text = this.$refs.textRef
-      const globalHub = this.$refs.globalHubRef
       
-      // Ensure we have everything we need
+      const servicesTitle = this.$refs.servicesTitleRef
+      const globalHub = this.$refs.globalHubRef
+      const restaurant = this.$refs.restaurantRef
+      const importExport = this.$refs.importExportRef
+      
+      const treeOverlay = this.$refs.treeOverlayRef
+      const finalSlogan = this.$refs.finalSloganRef
+      
       if (!video || !container || !video.duration) {
-          console.warn('Planet animation missing refs or video duration', { video, container, duration: video?.duration })
+          console.warn('Planet animation missing refs or video duration')
           return 
       }
 
       this.isInitialized = true
       
-      // Initial state setup
       video.pause()
       video.currentTime = 0
       
-      // Create timeline
       this.timeline = gsap.timeline({
         scrollTrigger: {
             trigger: container,
             start: 'top top',
-            end: '+=800%', // Increased distance heavily to allow time for pause
+            end: '+=2000%', // Significantly longer scroll distance for multiple steps
             pin: true,
             scrub: 1,
             markers: false, 
@@ -68,55 +74,48 @@ export default {
         }
       })
 
-      // 1. INTRO: Overlay & Text Fade Out
-      if (overlay) {
-          this.timeline.to(overlay, { opacity: 0, duration: 2, ease: "none" })
-      }
-      if (text) {
-          this.timeline.to(text, { opacity: 0, duration: 2, ease: "none" }, "<")
-      }
+      // --- SEQUENCE START ---
 
-      // 2. PHASE 1: Scrub video to 30%
-      const phase1Time = video.duration * 0.3
-      const phase2Time = video.duration * 0.35 // Move to 35% during the "slow" phase
+      // 1. INTRO: Fade out Initial Overlay & Title
+      this.timeline.to([overlay, text], { opacity: 0, duration: 1, ease: "none" })
+
+      // 2. VIDEO START: Scrub video a bit to get moving
+      const videoDur = video.duration
+      this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 2, ease: "none" })
+
+      // 3. SHOW "SERVICES" TITLE
+      this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" })
+      this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 2, ease: "none" }) // keep moving slightly
+      this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" })
+
+      // 4. GLOBAL HUB
+      this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" })
+      this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 4, ease: "none" }) // Slow move
+      this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" })
+
+      // 5. RESTAURANT BUSINESS
+      this.timeline.to(restaurant, { opacity: 1, duration: 1, ease: "none" })
+      this.timeline.to(video, { currentTime: videoDur * 0.55, duration: 4, ease: "none" }) // Slow move
+      this.timeline.to(restaurant, { opacity: 0, duration: 1, ease: "none" })
+
+      // 6. IMPORT & EXPORT
+      this.timeline.to(importExport, { opacity: 1, duration: 1, ease: "none" })
+      this.timeline.to(video, { currentTime: videoDur * 0.75, duration: 4, ease: "none" }) // Slow move
+      this.timeline.to(importExport, { opacity: 0, duration: 1, ease: "none" })
+
+      // 7. FINISH VIDEO to TREE & SHOW TREE IMAGE
+      // Scrub quickly to end
+      this.timeline.to(video, { currentTime: videoDur - 0.1, duration: 3, ease: "none" })
       
-      this.timeline.to(video, {
-          currentTime: phase1Time,
-          duration: 2.0, 
-          ease: "none"
-      })
+      // Fade in Tree Image (Static Last Frame)
+      this.timeline.to(treeOverlay, { opacity: 1, duration: 1, ease: "none" })
 
-      // 3. PHASE 2: SLOW MOTION & SHOW INFO
-      if (globalHub) {
-          // Fade In Info
-          this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: 'none'})
-          
-          // Slow Motion Video (scrub from 30% to 45% over a long duration)
-          // Run concurrently with the Info Card being visible
-          this.timeline.to(video, {
-              currentTime: phase2Time,
-              duration: 5, // Long duration for short video segment = slow motion
-              ease: "none"
-          }, "<")
-          
-          // Fade Out Info
-          this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: 'none'})
-      } else {
-          // Fallback if no globalHub ref (shouldn't happen but good safety)
-          this.timeline.to(video, {
-              currentTime: phase2Time,
-              duration: 5,
-              ease: "none"
-          })
-      }
-
-      // 4. PHASE 3: Resume video scrubbing to end
-      this.timeline.to(video, {
-          currentTime: video.duration,
-          duration: 4, // Remaining duration speed up again
-          ease: "none"
-      })
+      // 8. SHOW FINAL SLOGAN
+      this.timeline.to(finalSlogan, { opacity: 1, y: 0, duration: 2, ease: "power2.out" })
       
+      // Hold for a moment
+      this.timeline.to({}, { duration: 2 })
+
       ScrollTrigger.refresh()
     }
   }
@@ -128,12 +127,35 @@ export default {
     <div ref="overlayRef" class="overlay"></div>
     <div ref="textRef" class="intro-text">AokiT Inc.</div>
     
-    <!-- Global Hub Info Card -->
-    <div ref="globalHubRef" class="global-hub-info">
-      <div class="text-center">
-        <h4 class="section-heading">Global Hub</h4>
-        <p class="text-muted">Creating smooth pathways for global exchange and human resources.</p>
-      </div>
+    <!-- Services Title -->
+    <div ref="servicesTitleRef" class="info-card services-title">
+      <h2>Services</h2>
+    </div>
+
+    <!-- Global Hub -->
+    <div ref="globalHubRef" class="info-card">
+      <h3 class="card-title">Global Hub</h3>
+      <p class="card-desc">Creating smooth pathways for global exchange and human resources.</p>
+    </div>
+
+    <!-- Restaurant -->
+    <div ref="restaurantRef" class="info-card">
+      <h3 class="card-title">Restaurant Business</h3>
+      <p class="card-desc">Bringing the essence of Japan to local communities through authentic culinary experiences.</p>
+    </div>
+
+    <!-- Import & Export -->
+    <div ref="importExportRef" class="info-card">
+      <h3 class="card-title">Import & Export</h3>
+      <p class="card-desc">Facilitating the exchange of food, culture, and products between Japan and the world.</p>
+    </div>
+
+    <!-- Tree Image Overlay -->
+    <div ref="treeOverlayRef" class="tree-overlay" :style="{ backgroundImage: `url(${treeImage})` }"></div>
+
+    <!-- Final Slogan -->
+    <div ref="finalSloganRef" class="final-slogan">
+      <span>Connecting Japan and the World</span>
     </div>
 
     <video 
@@ -152,70 +174,109 @@ export default {
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #000;
   position: relative;
-}
-
-.overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    z-index: 2; 
-    opacity: 1; 
-    pointer-events: none;
-}
-
-.intro-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 3rem;
-    font-weight: bold;
-    z-index: 3;
-    pointer-events: none;
-    opacity: 1;
-}
-
-.global-hub-info {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    color: white;
-    transform: translate(-50%, -50%);
-    z-index: 4; /* Higher than text/overlay */
-    opacity: 0; /* Hidden by default */
-    background: rgba(36, 36, 36, 0.507);
-    padding: 2rem;
-    width: 100%;
-    box-shadow: 0 0 10px rgba(9, 4, 4, 0.51);
-    pointer-events: none;
-}
-.global-hub-info .text-muted {
-    color: #c7d5e0 !important;
-}
-.global-hub-info .section-heading {
-    text-transform: uppercase;
-    font-weight: 700;
-    margin-top: 15px;
-    margin-bottom: 10px;
-    color: #e7e7e7;
-}
-.global-hub-info .text-primary {
-    color: #fed136 !important;
+  background-color: #000;
 }
 
 .planet-video {
   width: 100%;
   height: 100%;
-  object-fit:cover;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
   z-index: 1;
+}
+
+/* Overlays */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: black;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.intro-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 4rem;
+  font-weight: 900;
+  z-index: 11;
+  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Info Cards */
+.info-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  opacity: 0;
+  text-align: center;
+  color: white;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  width: 80%;
+  max-width: 600px;
+  pointer-events: none;
+}
+
+.services-title h2 {
+    font-size: 5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fed136; /* Brand color idea */
+}
+
+.card-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+.card-desc {
+    font-size: 1.5rem;
+    font-weight: 300;
+    line-height: 1.4;
+}
+
+/* Tree Image Overlay */
+.tree-overlay {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 2; /* Above video */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Final Slogan */
+.final-slogan {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(50px); /* Start slightly lower */
+    width: 100%;
+    text-align: center;
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.final-slogan span {
+    color: white;
+    font-size: 3.5rem;
+    font-weight: bold;
+    font-family: 'Alfa Slab One', cursive; /* Matching Hero style */
+    text-transform: uppercase;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.9);
 }
 </style>
