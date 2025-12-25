@@ -11,7 +11,6 @@ import Planet from '../components/organisms/Planet.vue'
 <template>
   <MainLayout>
     <Planet />
-    <Hero />
     <AboutSection />
     <TeamSection />
     <ClientsSection />

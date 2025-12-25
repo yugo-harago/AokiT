@@ -3,11 +3,15 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mp4'
 import treeImage from '../../assets/img/Planet/Tree.jpg'
+import Hero from './Hero.vue'
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default {
   name: 'Planet',
+  components: {
+    Hero
+  },
   data() {
     return {
       planetVideo,
@@ -164,7 +168,7 @@ export default {
 
     <!-- Final Slogan -->
     <div ref="finalSloganRef" class="final-slogan">
-      <span>Connecting Japan and the World</span>
+      <Hero />
     </div>
 
     <video 
@@ -272,7 +276,7 @@ export default {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) translateY(50px); /* Start slightly lower */
+    transform: translate(-50%, -50%); /* Clean center */
     width: 100%;
     text-align: center;
     z-index: 20;
