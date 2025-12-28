@@ -30,47 +30,47 @@ onMounted(() => {
         }
       })
 
-      // Panel 2 (Established) - Enters from LEFT
+      // Panel 2 (Established) - Enters from BOTTOM
       tl.fromTo('.panel-established', 
-        { xPercent: -100 }, 
-        { xPercent: 0, duration: 1, ease: 'none' }
+        { yPercent: 100 }, 
+        { yPercent: 0, duration: 1, ease: 'none' }
       )
       .fromTo('.text-established', 
-        { opacity: 0, x: -50 }, 
-        { opacity: 1, x: 0, duration: 0.5 }, 
-        '>-0.5' // Overlap slightly
+        { opacity: 0, y: 50 }, 
+        { opacity: 1, y: 0, duration: 0.5 }, 
+        '>-0.5' 
       )
 
-      // Panel 3 (Mission) - Enters from RIGHT
+      // Panel 3 (Mission) - Enters from BOTTOM
       tl.fromTo('.panel-mission', 
-        { xPercent: 100 }, 
-        { xPercent: 0, duration: 1, ease: 'none' }
+        { yPercent: 100 }, 
+        { yPercent: 0, duration: 1, ease: 'none' }
       )
       .fromTo('.text-mission', 
-        { opacity: 0, x: 50 }, 
-        { opacity: 1, x: 0, duration: 0.5 }, 
+        { opacity: 0, y: 50 }, 
+        { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5'
       )
 
-      // Panel 4 (Positioning) - Enters from LEFT
+      // Panel 4 (Positioning) - Enters from BOTTOM
       tl.fromTo('.panel-positioning', 
-        { xPercent: -100 }, 
-        { xPercent: 0, duration: 1, ease: 'none' }
+        { yPercent: 100 }, 
+        { yPercent: 0, duration: 1, ease: 'none' }
       )
       .fromTo('.text-positioning', 
-        { opacity: 0, x: -50 }, 
-        { opacity: 1, x: 0, duration: 0.5 }, 
+        { opacity: 0, y: 50 }, 
+        { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5'
       )
 
-      // Panel 5 (Mountains/Future) - Enters from RIGHT
+      // Panel 5 (Mountains/Future) - Enters from BOTTOM
       tl.fromTo('.panel-future', 
-        { xPercent: 100 }, 
-        { xPercent: 0, duration: 1, ease: 'none' }
+        { yPercent: 100 }, 
+        { yPercent: 0, duration: 1, ease: 'none' }
       )
       .fromTo('.text-future', 
-        { opacity: 0, x: 50 }, 
-        { opacity: 1, x: 0, duration: 0.5 }, 
+        { opacity: 0, y: 50 }, 
+        { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5'
       )
 
@@ -142,6 +142,8 @@ onMounted(() => {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+  margin: 0; 
+  padding: 0;
 }
 
 .about-container {
@@ -172,9 +174,6 @@ onMounted(() => {
 }
 .panel-established {
   z-index: 2;
-  /* define start positions here if not using fromTo in GSAP immediately on render? 
-     Actually GSAP handles 'fromTo' so it will force the start position immediately.
-     But good to correct z-index order. */
 }
 .panel-mission {
   z-index: 3;
@@ -187,13 +186,14 @@ onMounted(() => {
 }
 
 .content-overlay {
-  background: rgba(0, 0, 0, 0.5); /* Readable text bg */
+  /* Removed background box */
   padding: 2rem;
-  border-radius: 8px;
   text-align: center;
   color: white;
   max-width: 800px;
   margin: 0 1rem;
+  /* Added text shadow for legibility */
+  text-shadow: 0 4px 20px rgba(0,0,0,0.8);
 }
 
 .section-title {
