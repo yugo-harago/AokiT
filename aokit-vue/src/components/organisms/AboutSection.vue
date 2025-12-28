@@ -24,11 +24,14 @@ onMounted(() => {
           pin: true,
           scrub: 1,
           start: 'top top',
-          end: '+=5000', 
+          end: '+=8000', // Increased total scroll distance to accommodate pauses
           invalidateOnRefresh: true, // Recalculate on resize/refresh
           fastScrollEnd: true,
         }
       })
+      
+      // PAUSE for Intro
+      tl.to({}, { duration: 1 }) 
 
       // Panel 2 (Established) - Enters from BOTTOM
       tl.fromTo('.panel-established', 
@@ -40,6 +43,7 @@ onMounted(() => {
         { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5' 
       )
+      .to({}, { duration: 1 }) // PAUSE
 
       // Panel 3 (Mission) - Enters from BOTTOM
       tl.fromTo('.panel-mission', 
@@ -51,6 +55,7 @@ onMounted(() => {
         { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5'
       )
+      .to({}, { duration: 1 }) // PAUSE
 
       // Panel 4 (Positioning) - Enters from BOTTOM
       tl.fromTo('.panel-positioning', 
@@ -62,6 +67,7 @@ onMounted(() => {
         { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5'
       )
+      .to({}, { duration: 1 }) // PAUSE
 
       // Panel 5 (Mountains/Future) - Enters from BOTTOM
       tl.fromTo('.panel-future', 
@@ -73,6 +79,7 @@ onMounted(() => {
         { opacity: 1, y: 0, duration: 0.5 }, 
         '>-0.5'
       )
+      .to({}, { duration: 1 }) // PAUSE at end
 
     }, aboutSection.value) 
     
