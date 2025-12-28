@@ -1,74 +1,210 @@
 <script setup>
-import SectionHeading from '../atoms/SectionHeading.vue'
-import TimelineItem from '../molecules/TimelineItem.vue'
-import img1 from '../../assets/img/about/1.jpg'
-import img2 from '../../assets/img/about/2.jpg'
-import img3 from '../../assets/img/about/3.jpg'
-import img4 from '../../assets/img/about/4.jpg'
+import { onMounted, onUnmounted, ref, nextTick } from 'vue'
+import gsap from 'gsap'
+import ScrollTrigger from 'gsap/ScrollTrigger'
 
-const timelineItems = [
-  {
-    date: 'November 2025',
-    heading: 'Established',
-    body: 'AokiT Inc. was founded in Austin, Texas, to serve as an international hub connecting Japan and the world.',
-    image: img1,
-    inverted: false
-  },
-  {
-    date: 'Our Mission',
-    heading: 'Connecting Japan & The World',
-    body: 'We facilitate the exchange of food, culture, products, and human resources, bringing the essence of Japan and new value to local communities.',
-    image: img2,
-    inverted: true
-  },
-  {
-    date: 'Our Positioning',
-    heading: 'Creating Value',
-    body: 'With strong connections to Japan and cross-border business expertise, we prioritize human networks and respect for Japanese food culture.',
-    image: img3,
-    inverted: false
-  },
-  {
-    date: 'Future',
-    heading: 'Expanding Horizons',
-    body: 'We continue to create smooth pathways for global exchange, leveraging our expertise in real estate, insurance, and import/export operations.',
-    image: img4,
-    inverted: true
-  }
-]
+// Import images
+import imgAustin from '../../assets/img/slider/1_austin.jpg'
+import imgSunrise from '../../assets/img/slider/2_sunrise.png'
+import imgConnection from '../../assets/img/slider/3_connection.png'
+import imgPositioning from '../../assets/img/slider/4_positioning.png'
+import imgMountains from '../../assets/img/slider/5_mountains.png'
+
+const aboutSection = ref(null)
+
+onMounted(() => {
+  gsap.registerPlugin(ScrollTrigger)
+
+  // Delay initialization slightly to ensure previous sections (Planet) have settled
+  const timer = setTimeout(() => {
+     const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: aboutSection.value,
+          pin: true,
+          scrub: 1,
+          start: 'top top',
+          end: '+=5000', 
+          invalidateOnRefresh: true, // Recalculate on resize/refresh
+          fastScrollEnd: true,
+        }
+      })
+
+      // Panel 2 (Established) - Enters from LEFT
+      tl.fromTo('.panel-established', 
+        { xPercent: -100 }, 
+        { xPercent: 0, duration: 1, ease: 'none' }
+      )
+      .fromTo('.text-established', 
+        { opacity: 0, x: -50 }, 
+        { opacity: 1, x: 0, duration: 0.5 }, 
+        '>-0.5' // Overlap slightly
+      )
+
+      // Panel 3 (Mission) - Enters from RIGHT
+      tl.fromTo('.panel-mission', 
+        { xPercent: 100 }, 
+        { xPercent: 0, duration: 1, ease: 'none' }
+      )
+      .fromTo('.text-mission', 
+        { opacity: 0, x: 50 }, 
+        { opacity: 1, x: 0, duration: 0.5 }, 
+        '>-0.5'
+      )
+
+      // Panel 4 (Positioning) - Enters from LEFT
+      tl.fromTo('.panel-positioning', 
+        { xPercent: -100 }, 
+        { xPercent: 0, duration: 1, ease: 'none' }
+      )
+      .fromTo('.text-positioning', 
+        { opacity: 0, x: -50 }, 
+        { opacity: 1, x: 0, duration: 0.5 }, 
+        '>-0.5'
+      )
+
+      // Panel 5 (Mountains/Future) - Enters from RIGHT
+      tl.fromTo('.panel-future', 
+        { xPercent: 100 }, 
+        { xPercent: 0, duration: 1, ease: 'none' }
+      )
+      .fromTo('.text-future', 
+        { opacity: 0, x: 50 }, 
+        { opacity: 1, x: 0, duration: 0.5 }, 
+        '>-0.5'
+      )
+
+    }, aboutSection.value) 
+    
+    // Force a refresh after satisfying the timeline
+    ScrollTrigger.refresh()
+    
+    // Cleanup 
+    onUnmounted(() => {
+      ctx.revert()
+      clearTimeout(timer)
+    })
+  }, 500) // 500ms delay to allow Planet.vue video metadata to load and expand layout
+})
 </script>
 
 <template>
-  <section id="about">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12 text-center">
-          <SectionHeading 
-            title="About" 
-            subtitle="Bringing the essence of Japan and new value to local communities." 
-          />
+  <section ref="aboutSection" id="about" class="about-section">
+    <div class="about-container">
+      
+      <!-- Panel 1: Intro (Base Layer) -->
+      <div class="panel panel-intro" :style="{ backgroundImage: `url(${imgAustin})` }">
+        <div class="content-overlay">
+          <h2 class="section-title">About</h2>
+          <p class="section-text">Bringing the essence of Japan and new value to local communities.</p>
         </div>
       </div>
-      <div class="row">
-        <div class="col-lg-12">
-          <ul class="list-group timeline">
-            <TimelineItem 
-              v-for="(item, index) in timelineItems" 
-              :key="index"
-              :date="item.date"
-              :heading="item.heading"
-              :body="item.body"
-              :image="item.image"
-              :inverted="item.inverted"
-            />
-            <li class="list-group-item timeline-inverted">
-              <div class="timeline-image">
-                <h4>Be Part<br>&nbsp;Of Our<br>&nbsp;Story!</h4>
-              </div>
-            </li>
-          </ul>
+
+      <!-- Panel 2: Established -->
+      <div class="panel panel-established" :style="{ backgroundImage: `url(${imgSunrise})` }">
+        <div class="content-overlay text-established">
+          <h2 class="section-title">Established</h2>
+          <p class="section-text">AokiT Inc. was founded in Austin, Texas, to serve as an international hub connecting Japan and the world.</p>
         </div>
       </div>
+
+      <!-- Panel 3: Mission -->
+      <div class="panel panel-mission" :style="{ backgroundImage: `url(${imgConnection})` }">
+        <div class="content-overlay text-mission">
+          <h2 class="section-title">Our Mission</h2>
+          <p class="section-text">We facilitate the exchange of food, culture, products, and human resources, bringing the essence of Japan and new value to local communities.</p>
+        </div>
+      </div>
+
+      <!-- Panel 4: Positioning -->
+      <div class="panel panel-positioning" :style="{ backgroundImage: `url(${imgPositioning})` }">
+        <div class="content-overlay text-positioning">
+          <h2 class="section-title">Our Positioning</h2>
+          <p class="section-text">With strong connections to Japan and cross-border business expertise, we prioritize human networks and respect for Japanese food culture.</p>
+        </div>
+      </div>
+
+      <!-- Panel 5: Future -->
+      <div class="panel panel-future" :style="{ backgroundImage: `url(${imgMountains})` }">
+        <div class="content-overlay text-future">
+          <h2 class="section-title">Future</h2>
+          <p class="section-text">We continue to create smooth pathways for global exchange, leveraging our expertise in real estate, insurance, and import/export operations.</p>
+        </div>
+      </div>
+
     </div>
   </section>
 </template>
+
+<style scoped>
+.about-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.about-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Ensure panels stack correctly if not moved */
+  z-index: 1; 
+}
+
+/* Base layer should be at bottom */
+.panel-intro {
+  z-index: 1;
+}
+.panel-established {
+  z-index: 2;
+  /* define start positions here if not using fromTo in GSAP immediately on render? 
+     Actually GSAP handles 'fromTo' so it will force the start position immediately.
+     But good to correct z-index order. */
+}
+.panel-mission {
+  z-index: 3;
+}
+.panel-positioning {
+  z-index: 4;
+}
+.panel-future {
+  z-index: 5;
+}
+
+.content-overlay {
+  background: rgba(0, 0, 0, 0.5); /* Readable text bg */
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  margin: 0 1rem;
+}
+
+.section-title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.section-text {
+  font-size: 1.5rem;
+  line-height: 1.6;
+}
+</style>

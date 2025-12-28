@@ -23,7 +23,6 @@
 
 .intro-heading {
   font-size: 3.25rem;
-  font-weight: 700;
   line-height: 1.2;
   margin-bottom: 25px;
   font-family: 'Alfa Slab One', cursive;
