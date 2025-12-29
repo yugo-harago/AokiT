@@ -1,6 +1,8 @@
 <script>
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useRoute } from 'vue-router'
+import { watch } from 'vue'
 import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mp4'
 import treeImage from '../../assets/img/Planet/Tree.jpg'
 import Hero from './Hero.vue'
@@ -22,15 +24,34 @@ export default {
   created() {
     this.timeline = null
   },
+  setup() {
+      const route = useRoute()
+      return { route }
+  },
   mounted() {
     const video = this.$refs.videoRef
     if (video) {
+        // Initial check for hash
+        if (this.route.hash === '#services') {
+             // We need to wait for init
+        }
+
       if (video.readyState >= 1) {
         this.initScrollAnimation()
       } else {
         video.addEventListener('loadedmetadata', this.initScrollAnimation)
       }
     }
+
+    // Watch for hash changes while on the page
+    this.$watch(
+      () => this.route.hash,
+      (newHash) => {
+        if (newHash === '#services') {
+          this.scrollToServices()
+        }
+      }
+    )
   },
   beforeUnmount() {
     if (this.timeline) this.timeline.kill()
@@ -129,7 +150,43 @@ export default {
       // Hold for a moment
       this.timeline.to({}, { duration: 2 })
 
-      ScrollTrigger.refresh()
+      
+      // Check if we need to scroll to services initially
+      if (this.route.hash === '#services') {
+          // Small delay to ensure everything is ready
+          setTimeout(() => {
+              this.scrollToServices()
+          }, 100)
+      }
+    },
+    scrollToServices() {
+        if (!this.timeline) return
+
+        // Get the scroll position associated with the 'services' label
+        const servicesLabelTime = this.timeline.labels['services']
+        
+        // We need to find the scroll position. 
+        // GSAP ScrollTrigger maps scroll distance to timeline duration.
+        // We can use the timeline's scrollTrigger to get the associated scroll position.
+        
+        // However, a simpler way with scrub is usually to scroll the window.
+        // But we need to know WHERE.
+        
+        // Let's use the scrollTrigger's method if available or calculate it.
+        const st = this.timeline.scrollTrigger
+        if (st) {
+             // Calculate progress (0 to 1) of the label
+             const progress = servicesLabelTime / this.timeline.duration()
+             
+             // Calculate scroll position
+             // start + (end - start) * progress
+             const scrollPos = st.start + (st.end - st.start) * progress
+             
+             window.scrollTo({
+                 top: scrollPos,
+                 behavior: 'smooth'
+             })
+        }
     }
   }
 }

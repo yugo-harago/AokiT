@@ -6,10 +6,10 @@ import NavList from '../molecules/NavList.vue'
 const mainNav = ref(null)
 
 const navItems = [
-  { href: '#services', label: 'Services' },
-  { href: '#about', label: 'About' },
-  { href: '#team', label: 'Team' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#about', label: 'About' },
+  { href: '/#team', label: 'Team' },
+  { href: '/#contact', label: 'Contact' },
 ]
 
 onMounted(() => {
