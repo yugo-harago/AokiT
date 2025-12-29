@@ -193,7 +193,11 @@ onMounted(() => {
 }
 
 .content-overlay {
-  /* Removed background box */
+  /* Added background for better readability */
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 30px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+
   padding: 2rem;
   text-align: center;
   color: white;
