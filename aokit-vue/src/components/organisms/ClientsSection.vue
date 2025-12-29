@@ -4,7 +4,8 @@ import img2 from '../../assets/img/clients/designmodo.jpg'
 import img3 from '../../assets/img/clients/envato.jpg'
 import img4 from '../../assets/img/clients/themeforest.jpg'
 
-const clients = [img1, img2, img3, img4]
+// const clients = [img1, img2, img3, img4] // Example of clients
+const clients = []
 </script>
 
 <template>

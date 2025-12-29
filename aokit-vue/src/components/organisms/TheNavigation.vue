@@ -28,7 +28,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <nav class="navbar navbar-expand-lg fixed-top bg-dark navbar-dark navbar-shrink" id="mainNav" ref="mainNav">
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark navbar-shrink" id="mainNav" ref="mainNav">
     <div class="container">
       <BrandLogo />
       <button 

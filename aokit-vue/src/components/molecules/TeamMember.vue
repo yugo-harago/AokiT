@@ -14,6 +14,10 @@ defineProps({
     type: String,
     required: true
   },
+  email: {
+    type: String,
+    default: ''
+  },
   socials: {
     type: Array,
     default: () => []
@@ -27,6 +31,7 @@ defineProps({
       <img class="rounded-circle mx-auto" :src="image" :alt="name">
       <h4>{{ name }}</h4>
       <p class="text-muted">{{ role }}</p>
+      <a v-if="email" :href="`mailto:${email}`" class="d-block text-muted mb-3">{{ email }}</a>
       <ul class="list-inline social-buttons">
         <SocialIcon 
           v-for="(social, index) in socials" 

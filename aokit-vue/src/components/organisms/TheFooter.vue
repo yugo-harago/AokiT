@@ -1,11 +1,12 @@
 <script setup>
 import SocialIcon from '../atoms/SocialIcon.vue'
 
-const socialLinks = [
-  { icon: 'twitter', href: '#' },
-  { icon: 'facebook', href: '#' },
-  { icon: 'linkedin', href: '#' }
-]
+// const socialLinks = [
+//   { icon: 'twitter', href: '#' },
+//   { icon: 'facebook', href: '#' },
+//   { icon: 'linkedin', href: '#' }
+// ] // Example of social links
+const socialLinks = []
 </script>
 
 <template>
@@ -27,8 +28,8 @@ const socialLinks = [
         </div>
         <div class="col-md-4">
           <ul class="list-inline quicklinks">
-            <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
-            <li class="list-inline-item"><a href="#">Terms of Use</a></li>
+            <li class="list-inline-item"><router-link to="/privacy-policy">Privacy Policy</router-link></li>
+            <li class="list-inline-item"><router-link to="/privacy-policy">Terms of Use</router-link></li>
           </ul>
         </div>
       </div>
