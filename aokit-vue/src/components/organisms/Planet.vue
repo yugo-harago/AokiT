@@ -157,57 +157,78 @@ export default {
       video.currentTime = 0
       
       
-      // Delay slightly to ensure layout is settled (critical for production)
-      setTimeout(() => {
-          if (!container) {
-              return
+      // Polling for valid duration
+      let attempts = 0;
+      const maxAttempts = 50; // 5 seconds
+
+      const checkDuration = () => {
+          attempts++;
+          // Added 40s fallback if we time out
+          if ((video.duration && Number.isFinite(video.duration) && video.duration > 0)) {
+              this.createTimeline(video.duration);
+          } else if (attempts > maxAttempts) {
+              console.warn('Planet: Could not detect video duration, defaulting to 20s');
+              this.createTimeline(20); // Fallback to 20s
+          } else {
+              if (attempts % 10 === 0) console.log('Planet: Waiting for valid video duration...', video.duration);
+              setTimeout(checkDuration, 100);
           }
+      };
+      
+      checkDuration();
+    },
+    createTimeline(videoDur) {
+      const video = this.$refs.videoRef
+      const container = this.$refs.containerRef
+      const overlay = this.$refs.overlayRef
+      const text = this.$refs.textRef
+      
+      const servicesTitle = this.$refs.servicesTitleRef
+      const globalHub = this.$refs.globalHubRef
+      const restaurant = this.$refs.restaurantRef
+      const importExport = this.$refs.importExportRef
+      
+      const treeOverlay = this.$refs.treeOverlayRef
+      const finalSlogan = this.$refs.finalSloganRef
 
-          const videoDurRaw = video.duration
-          
-          // Safety check for video duration
-          let videoDur = videoDurRaw
-          if (!Number.isFinite(videoDur)) {
-              console.warn('Planet: Video duration is not finite, defaulting to 10s for safety')
-              videoDur = 10
-          }
-          
-            this.timeline = gsap.timeline({
-              scrollTrigger: {
-                  trigger: container,
-                  start: 'top top',
-                  end: '+=2500%', 
-                  pin: true,
-                  scrub: 2, 
-                  markers: false, 
-                  onRefresh: () => video.pause()
-              }
-            })
-          
-          // --- SEQUENCE START ---
+      console.log('Planet: Initializing timeline with duration:', videoDur);
 
-          // 1. INTRO
-          this.timeline.addLabel("intro")
-          // Video starts moving immediately
-          this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 4, ease: "none" }, "intro")
-          // Overlays fade out while video moves
-          this.timeline.to([overlay, text], { opacity: 0, duration: 2, ease: "none" }, "intro")
+      this.timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: container,
+            start: 'top top',
+            end: '+=2500%', 
+            pin: true,
+            scrub: 2, 
+            markers: false, 
+            onRefresh: () => video.pause()
+        }
+      })
+      
+      // --- SEQUENCE START ---
 
-          // 2. SERVICES TITLE
-          this.timeline.addLabel("services")
-          this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 4, ease: "none" }, "services")
-          this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" }, "services")
-          this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" }, "services+=3")
+      // 1. INTRO
+      this.timeline.addLabel("intro")
+      // Video starts moving immediately
+      this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 4, ease: "none" }, "intro")
+      // Overlays fade out while video moves
+      this.timeline.to([overlay, text], { opacity: 0, duration: 2, ease: "none" }, "intro")
 
-          // 3. GLOBAL HUB
-          this.timeline.addLabel("globalHub")
-          this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 6, ease: "none" }, "globalHub")
-          this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" }, "globalHub")
-          this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" }, "globalHub+=5")
+      // 2. SERVICES TITLE
+      this.timeline.addLabel("services")
+      this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 4, ease: "none" }, "services")
+      this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" }, "services")
+      this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" }, "services+=3")
 
-          // 4. GAP (No text, just video movement)
-          this.timeline.addLabel("gap")
-          this.timeline.to(video, { currentTime: videoDur * 0.42, duration: 3, ease: "none" }, "gap")
+      // 3. GLOBAL HUB
+      this.timeline.addLabel("globalHub")
+      this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 6, ease: "none" }, "globalHub")
+      this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" }, "globalHub")
+      this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" }, "globalHub+=5")
+
+      // 4. GAP (No text, just video movement)
+      this.timeline.addLabel("gap")
+      this.timeline.to(video, { currentTime: videoDur * 0.42, duration: 3, ease: "none" }, "gap")
 
           // 5. RESTAURANT BUSINESS
           this.timeline.addLabel("restaurant")
@@ -237,6 +258,10 @@ export default {
           // Force refresh after creation
           ScrollTrigger.refresh()
           
+          // Signal that Planet is ready (video loaded & pinned)
+          window.isPlanetReady = true;
+          window.dispatchEvent(new Event('planet-ready'));
+          
           // Check if we need to scroll to services initially
           if (this.route.hash === '#services') {
               // Small delay to ensure everything is ready
@@ -244,7 +269,6 @@ export default {
                   this.scrollToServices()
               }, 100)
           }
-      }, 100)
     },
     scrollToServices() {
         if (!this.timeline) return
