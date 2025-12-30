@@ -1,0 +1,7 @@
+services:
+  aokit-vue:
+    build:
+      context: ./aokit-vue
+    ports:
+      - "8111:8111"
+    restart: always
