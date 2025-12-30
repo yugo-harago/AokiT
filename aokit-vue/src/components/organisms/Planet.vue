@@ -3,7 +3,7 @@ import gsap from 'gsap/dist/gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useRoute } from 'vue-router'
 import { watch } from 'vue'
-import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mov'
+import planetVideoUrl from '../../assets/video/PlanetRotating_and_zoom.mov' // Renamed for clarity
 import treeImage from '../../assets/img/Planet/Tree.jpg'
 import Hero from './Hero.vue'
 
@@ -19,9 +19,13 @@ export default {
   },
   data() {
     return {
-      planetVideo,
+      planetVideoUrl, // Original URL for fetching
+      videoBlobUrl: null, // Blob URL after loading
       treeImage,
-      isInitialized: false
+      isInitialized: false,
+      isLoading: true,
+      loadingProgress: 0,
+      loadingError: null
     }
   },
   created() {
@@ -32,8 +36,88 @@ export default {
       return { route }
   },
   mounted() {
+    // Lock scroll immediately
+    document.body.style.overflow = 'hidden'
+    
+    // Start loading video
+    this.loadVideo()
+
+    // Watch for hash changes while on the page
+    this.$watch(
+      () => this.route.hash,
+      (newHash) => {
+        if (newHash === '#services' && !this.isLoading) {
+          this.scrollToServices()
+        }
+      }
+    )
+  },
+  beforeUnmount() {
+    if (this.timeline) this.timeline.kill()
+    
+    // Unlock scroll on unmount just in case
+    document.body.style.overflow = ''
+    
+    // Revoke blob URL to free memory
+    if (this.videoBlobUrl) {
+        URL.revokeObjectURL(this.videoBlobUrl)
+    }
+
     const video = this.$refs.videoRef
     if (video) {
+        video.removeEventListener('loadedmetadata', this.initScrollAnimation)
+    }
+  },
+  methods: {
+    loadVideo() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', this.planetVideoUrl, true);
+        xhr.responseType = 'blob';
+
+        xhr.onload = (e) => {
+            if (xhr.status === 200) {
+                const blob = xhr.response;
+                this.videoBlobUrl = URL.createObjectURL(blob);
+                this.handleLoadComplete();
+            } else {
+                console.error('Planet: Failed to load video', xhr.statusText);
+                this.loadingError = 'Failed to load video';
+                // Fallback: try setting source directly (might act weird but better than nothing)
+                this.handleLoadComplete();
+            }
+        };
+
+        xhr.onprogress = (e) => {
+            if (e.lengthComputable) {
+                this.loadingProgress = Math.round((e.loaded / e.total) * 100);
+            }
+        };
+        
+        xhr.onerror = (e) => {
+             console.error('Planet: Network error loading video', e);
+             this.loadingError = 'Network error';
+             this.handleLoadComplete(); // Try validation anyway
+        };
+
+        xhr.send();
+    },
+    handleLoadComplete() {
+        this.loadingProgress = 100;
+        
+        // Small delay to let the user see 100%
+        setTimeout(() => {
+            this.isLoading = false;
+            document.body.style.overflow = ''; // Unlock scroll
+            
+            this.$nextTick(() => {
+                this.setupVideoListeners();
+            });
+        }, 500);
+    },
+    setupVideoListeners() {
+        const video = this.$refs.videoRef
+        if (!video) return
+
         video.addEventListener('error', (e) => {
             console.error('Planet: Video loading error', video.error)
         })
@@ -45,26 +129,7 @@ export default {
                 this.initScrollAnimation()
             })
         }
-    }
-
-    // Watch for hash changes while on the page
-    this.$watch(
-      () => this.route.hash,
-      (newHash) => {
-        if (newHash === '#services') {
-          this.scrollToServices()
-        }
-      }
-    )
-  },
-  beforeUnmount() {
-    if (this.timeline) this.timeline.kill()
-    const video = this.$refs.videoRef
-    if (video) {
-        video.removeEventListener('loadedmetadata', this.initScrollAnimation)
-    }
-  },
-  methods: {
+    },
     initScrollAnimation() {
       if (this.isInitialized) return
       
@@ -216,48 +281,65 @@ export default {
 
 <template>
   <div ref="containerRef" class="planet-container">
-    <div ref="overlayRef" class="overlay"></div>
-    <div ref="textRef" class="intro-text">AokiT Inc.</div>
     
-    <!-- Services Title -->
-    <div ref="servicesTitleRef" class="info-card services-title">
-      <h2>Services</h2>
+    <!-- Loading Overlay -->
+    <div v-if="isLoading" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading Experience... {{ loadingProgress }}%</div>
+            <div class="loading-bar-bg">
+                <div class="loading-bar-fill" :style="{ width: loadingProgress + '%' }"></div>
+            </div>
+            <div v-if="loadingError" class="loading-error">{{ loadingError }}</div>
+        </div>
     </div>
 
-    <!-- Global Hub -->
-    <div ref="globalHubRef" class="info-card">
-      <h3 class="card-title">Global Hub</h3>
-      <p class="card-desc">Creating smooth pathways for global exchange and human resources.</p>
+    <!-- Main Content -->
+    <div v-show="!isLoading" class="content-wrapper">
+        <div ref="overlayRef" class="overlay"></div>
+        <div ref="textRef" class="intro-text">AokiT Inc.</div>
+        
+        <!-- Services Title -->
+        <div ref="servicesTitleRef" class="info-card services-title">
+        <h2>Services</h2>
+        </div>
+
+        <!-- Global Hub -->
+        <div ref="globalHubRef" class="info-card">
+        <h3 class="card-title">Global Hub</h3>
+        <p class="card-desc">Creating smooth pathways for global exchange and human resources.</p>
+        </div>
+
+        <!-- Restaurant -->
+        <div ref="restaurantRef" class="info-card">
+        <h3 class="card-title">Restaurant Business</h3>
+        <p class="card-desc">Bringing the essence of Japan to local communities through authentic culinary experiences.</p>
+        </div>
+
+        <!-- Import & Export -->
+        <div ref="importExportRef" class="info-card">
+        <h3 class="card-title">Import & Export</h3>
+        <p class="card-desc">Facilitating the exchange of food, culture, and products between Japan and the world.</p>
+        </div>
+
+        <!-- Tree Image Overlay -->
+        <div ref="treeOverlayRef" class="tree-overlay" :style="{ backgroundImage: `url(${treeImage})` }"></div>
+
+        <!-- Final Slogan -->
+        <div ref="finalSloganRef" class="final-slogan">
+        <Hero />
+        </div>
+
+        <video 
+        v-if="videoBlobUrl || !isLoading"
+        ref="videoRef"
+        class="planet-video"
+        :src="videoBlobUrl || planetVideoUrl"
+        muted
+        playsinline
+        preload="auto"
+        ></video>
     </div>
-
-    <!-- Restaurant -->
-    <div ref="restaurantRef" class="info-card">
-      <h3 class="card-title">Restaurant Business</h3>
-      <p class="card-desc">Bringing the essence of Japan to local communities through authentic culinary experiences.</p>
-    </div>
-
-    <!-- Import & Export -->
-    <div ref="importExportRef" class="info-card">
-      <h3 class="card-title">Import & Export</h3>
-      <p class="card-desc">Facilitating the exchange of food, culture, and products between Japan and the world.</p>
-    </div>
-
-    <!-- Tree Image Overlay -->
-    <div ref="treeOverlayRef" class="tree-overlay" :style="{ backgroundImage: `url(${treeImage})` }"></div>
-
-    <!-- Final Slogan -->
-    <div ref="finalSloganRef" class="final-slogan">
-      <Hero />
-    </div>
-
-    <video 
-      ref="videoRef"
-      class="planet-video"
-      :src="planetVideo"
-      muted
-      playsinline
-      preload="auto"
-    ></video>
   </div>
 </template>
 
@@ -268,6 +350,63 @@ export default {
   overflow: hidden;
   position: relative;
   background-color: #000;
+}
+
+/* Loading Screen */
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: #000;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.loading-content {
+    text-align: center;
+    width: 300px;
+}
+
+.loading-text {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+.loading-bar-bg {
+    width: 100%;
+    height: 4px;
+    background-color: #333;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.loading-bar-fill {
+    height: 100%;
+    background-color: #4CAF50; /* Green accent */
+    transition: width 0.1s linear;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.content-wrapper {
+    width: 100%;
+    height: 100%;
 }
 
 .planet-video {
