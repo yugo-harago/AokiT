@@ -24,7 +24,7 @@ onMounted(() => {
           pin: true,
           scrub: 1,
           start: 'top top',
-          end: '+=8000', // Increased total scroll distance to accommodate pauses
+          end: '+=8000', // Increased total scroll distance to initial pause
           invalidateOnRefresh: true, // Recalculate on resize/refresh
           fastScrollEnd: true,
         }
@@ -92,59 +92,26 @@ onMounted(() => {
   }
 
   // --- Coordination Logic ---
-  const handlePlanetReady = () => {
-      console.log('AboutSection: Planet is ready, initializing...')
-      initGsapFromPlanet()
-      // Remove listener to avoid double init
-      window.removeEventListener('planet-ready', handlePlanetReady)
-  }
-
-  // 1. Check if already ready
-  if (window.isPlanetReady) {
-      initGsapFromPlanet()
-  } else {
-      // 2. Wait for event
-      window.addEventListener('planet-ready', handlePlanetReady)
-      
-      // 3. Fallback: If event never comes (e.g. video fails), init anyway after 5s
-      setTimeout(() => {
-          if (!ScrollTrigger.getById("about")) { // check if not already created (pseudo-check)
-              // We don't have an ID on the scrolltrigger above, but we can just check if we ran
-              // Actually, simply relying on the event listener removal is safer if we track state, but simple timeout is fine.
-              // Let's just blindly run if it hasn't run.
-              // For safety, we can check a ref or just remove the listener.
-              window.removeEventListener('planet-ready', handlePlanetReady)
-              // Only init if we haven't already (GSAP context check would be ideal but simple is better)
-              // We'll rely on the fact that if Planet fails, this runs. If Planet succeeds later, we might have double init?
-              // Let's use a flag.
-          }
-      }, 5000)
-  }
-  
-  // Refined Fallback with flag
   const isInitialized = ref(false)
-  const safeInit = () => {
+  
+  const initSafe = () => {
       if (isInitialized.value) return
       isInitialized.value = true
+      // console.log('AboutSection: Initializing GSAP')
       initGsapFromPlanet()
   }
 
   if (window.isPlanetReady) {
-      safeInit()
+      initSafe()
   } else {
       const onReady = () => {
-          safeInit()
+          initSafe()
           window.removeEventListener('planet-ready', onReady)
       }
       window.addEventListener('planet-ready', onReady)
       
-      // Fallback 4s
-      setTimeout(() => {
-          if (!isInitialized.value) {
-              console.warn('AboutSection: Planet ready timeout, forcing init')
-              onReady()
-          }
-      }, 4000)
+      // Note: No timeout fallback here. We strictly wait for Planet.vue to be ready.
+      // Planet.vue guarantees emission of 'planet-ready' even on video error.
   }
 })
 </script>

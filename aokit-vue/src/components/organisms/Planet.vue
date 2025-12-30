@@ -2,7 +2,6 @@
 import gsap from 'gsap/dist/gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useRoute } from 'vue-router'
-import { watch } from 'vue'
 import planetVideoUrl from '../../assets/video/PlanetRotating_and_zoom.mov' // Renamed for clarity
 import treeImage from '../../assets/img/Planet/Tree.jpg'
 import Hero from './Hero.vue'
@@ -120,6 +119,8 @@ export default {
 
         video.addEventListener('error', (e) => {
             console.error('Planet: Video loading error', video.error)
+            // Force init so we don't block the page
+            this.initScrollAnimation()
         })
 
         if (video.readyState >= 1) { // HAVE_METADATA
@@ -135,16 +136,6 @@ export default {
       
       const video = this.$refs.videoRef
       const container = this.$refs.containerRef
-      const overlay = this.$refs.overlayRef
-      const text = this.$refs.textRef
-      
-      const servicesTitle = this.$refs.servicesTitleRef
-      const globalHub = this.$refs.globalHubRef
-      const restaurant = this.$refs.restaurantRef
-      const importExport = this.$refs.importExportRef
-      
-      const treeOverlay = this.$refs.treeOverlayRef
-      const finalSlogan = this.$refs.finalSloganRef
       
       if (!video || !container || !video.duration) {
           console.warn('Planet animation missing refs or video duration')
