@@ -3,7 +3,7 @@ import gsap from 'gsap/dist/gsap'
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useRoute } from 'vue-router'
 import { watch } from 'vue'
-import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mp4'
+import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mov'
 import treeImage from '../../assets/img/Planet/Tree.jpg'
 import Hero from './Hero.vue'
 
@@ -107,17 +107,17 @@ export default {
               videoDur = 10
           }
           
-          this.timeline = gsap.timeline({
-            scrollTrigger: {
-                trigger: container,
-                start: 'top top',
-                end: '+=2500%', 
-                pin: true,
-                scrub: 1, 
-                markers: false, 
-                onRefresh: () => video.pause()
-            }
-          })
+            this.timeline = gsap.timeline({
+              scrollTrigger: {
+                  trigger: container,
+                  start: 'top top',
+                  end: '+=2500%', 
+                  pin: true,
+                  scrub: 2, 
+                  markers: false, 
+                  onRefresh: () => video.pause()
+              }
+            })
           
           // --- SEQUENCE START ---
 
