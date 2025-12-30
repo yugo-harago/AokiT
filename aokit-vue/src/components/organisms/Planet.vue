@@ -1,6 +1,6 @@
 <script>
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import gsap from 'gsap/dist/gsap'
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger'
 import { useRoute } from 'vue-router'
 import { watch } from 'vue'
 import planetVideo from '../../assets/video/PlanetRotating_and_zoom.mp4'
@@ -8,6 +8,9 @@ import treeImage from '../../assets/img/Planet/Tree.jpg'
 import Hero from './Hero.vue'
 
 gsap.registerPlugin(ScrollTrigger)
+ScrollTrigger.config({
+  autoRefreshEvents: "visibilitychange,DOMContentLoaded,load" // make it robust
+});
 
 export default {
   name: 'Planet',
@@ -31,16 +34,17 @@ export default {
   mounted() {
     const video = this.$refs.videoRef
     if (video) {
-        // Initial check for hash
-        if (this.route.hash === '#services') {
-             // We need to wait for init
-        }
+        video.addEventListener('error', (e) => {
+            console.error('Planet: Video loading error', video.error)
+        })
 
-      if (video.readyState >= 1) {
-        this.initScrollAnimation()
-      } else {
-        video.addEventListener('loadedmetadata', this.initScrollAnimation)
-      }
+        if (video.readyState >= 1) { // HAVE_METADATA
+            this.initScrollAnimation()
+        } else {
+            video.addEventListener('loadedmetadata', () => {
+                this.initScrollAnimation()
+            })
+        }
     }
 
     // Watch for hash changes while on the page
@@ -87,77 +91,95 @@ export default {
       video.pause()
       video.currentTime = 0
       
-      this.timeline = gsap.timeline({
-        scrollTrigger: {
-            trigger: container,
-            start: 'top top',
-            end: '+=2500%', // Increased scroll distance slightly for smoother feel
-            pin: true,
-            scrub: 1, // Increased scrub smoothing
-            markers: false, 
-            onRefresh: () => video.pause()
-        }
-      })
-
-      // --- SEQUENCE START ---
-      const videoDur = video.duration
-
-      // 1. INTRO
-      this.timeline.addLabel("intro")
-      // Video starts moving immediately
-      this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 4, ease: "none" }, "intro")
-      // Overlays fade out while video moves
-      this.timeline.to([overlay, text], { opacity: 0, duration: 2, ease: "none" }, "intro")
-
-      // 2. SERVICES TITLE
-      this.timeline.addLabel("services")
-      this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 4, ease: "none" }, "services")
-      this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" }, "services")
-      this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" }, "services+=3")
-
-      // 3. GLOBAL HUB
-      this.timeline.addLabel("globalHub")
-      this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 6, ease: "none" }, "globalHub")
-      this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" }, "globalHub")
-      this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" }, "globalHub+=5")
-
-      // 4. GAP (No text, just video movement)
-      this.timeline.addLabel("gap")
-      this.timeline.to(video, { currentTime: videoDur * 0.42, duration: 3, ease: "none" }, "gap")
-
-      // 5. RESTAURANT BUSINESS
-      this.timeline.addLabel("restaurant")
-      this.timeline.to(video, { currentTime: videoDur * 0.55, duration: 6, ease: "none" }, "restaurant")
-      this.timeline.to(restaurant, { opacity: 1, duration: 1, ease: "none" }, "restaurant")
-      this.timeline.to(restaurant, { opacity: 0, duration: 1, ease: "none" }, "restaurant+=5")
-
-      // 6. IMPORT & EXPORT
-      this.timeline.addLabel("importExport")
-      this.timeline.to(video, { currentTime: videoDur * 0.75, duration: 6, ease: "none" }, "importExport")
-      this.timeline.to(importExport, { opacity: 1, duration: 1, ease: "none" }, "importExport")
-      this.timeline.to(importExport, { opacity: 0, duration: 1, ease: "none" }, "importExport+=5")
-
-      // 7. FINISH VIDEO to TREE & SHOW TREE IMAGE
-      this.timeline.addLabel("finish")
-      this.timeline.to(video, { currentTime: videoDur - 0.1, duration: 4, ease: "none" }, "finish")
-      // Fade in Tree Image at the end of the video movement
-      this.timeline.to(treeOverlay, { opacity: 1, duration: 1, ease: "none" }, "finish+=3")
-
-      // 8. SHOW FINAL SLOGAN
-      this.timeline.addLabel("slogan")
-      this.timeline.to(finalSlogan, { opacity: 1, y: 0, duration: 2, ease: "power2.out" }, "slogan")
       
-      // Hold for a moment
-      this.timeline.to({}, { duration: 2 })
+      // Delay slightly to ensure layout is settled (critical for production)
+      setTimeout(() => {
+          if (!container) {
+              return
+          }
 
-      
-      // Check if we need to scroll to services initially
-      if (this.route.hash === '#services') {
-          // Small delay to ensure everything is ready
-          setTimeout(() => {
-              this.scrollToServices()
-          }, 100)
-      }
+          const videoDurRaw = video.duration
+          
+          // Safety check for video duration
+          let videoDur = videoDurRaw
+          if (!Number.isFinite(videoDur)) {
+              console.warn('Planet: Video duration is not finite, defaulting to 10s for safety')
+              videoDur = 10
+          }
+          
+          this.timeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: container,
+                start: 'top top',
+                end: '+=2500%', 
+                pin: true,
+                scrub: 1, 
+                markers: false, 
+                onRefresh: () => video.pause()
+            }
+          })
+          
+          // --- SEQUENCE START ---
+
+          // 1. INTRO
+          this.timeline.addLabel("intro")
+          // Video starts moving immediately
+          this.timeline.to(video, { currentTime: videoDur * 0.15, duration: 4, ease: "none" }, "intro")
+          // Overlays fade out while video moves
+          this.timeline.to([overlay, text], { opacity: 0, duration: 2, ease: "none" }, "intro")
+
+          // 2. SERVICES TITLE
+          this.timeline.addLabel("services")
+          this.timeline.to(video, { currentTime: videoDur * 0.20, duration: 4, ease: "none" }, "services")
+          this.timeline.to(servicesTitle, { opacity: 1, duration: 1, ease: "none" }, "services")
+          this.timeline.to(servicesTitle, { opacity: 0, duration: 1, ease: "none" }, "services+=3")
+
+          // 3. GLOBAL HUB
+          this.timeline.addLabel("globalHub")
+          this.timeline.to(video, { currentTime: videoDur * 0.35, duration: 6, ease: "none" }, "globalHub")
+          this.timeline.to(globalHub, { opacity: 1, duration: 1, ease: "none" }, "globalHub")
+          this.timeline.to(globalHub, { opacity: 0, duration: 1, ease: "none" }, "globalHub+=5")
+
+          // 4. GAP (No text, just video movement)
+          this.timeline.addLabel("gap")
+          this.timeline.to(video, { currentTime: videoDur * 0.42, duration: 3, ease: "none" }, "gap")
+
+          // 5. RESTAURANT BUSINESS
+          this.timeline.addLabel("restaurant")
+          this.timeline.to(video, { currentTime: videoDur * 0.55, duration: 6, ease: "none" }, "restaurant")
+          this.timeline.to(restaurant, { opacity: 1, duration: 1, ease: "none" }, "restaurant")
+          this.timeline.to(restaurant, { opacity: 0, duration: 1, ease: "none" }, "restaurant+=5")
+
+          // 6. IMPORT & EXPORT
+          this.timeline.addLabel("importExport")
+          this.timeline.to(video, { currentTime: videoDur * 0.75, duration: 6, ease: "none" }, "importExport")
+          this.timeline.to(importExport, { opacity: 1, duration: 1, ease: "none" }, "importExport")
+          this.timeline.to(importExport, { opacity: 0, duration: 1, ease: "none" }, "importExport+=5")
+
+          // 7. FINISH VIDEO to TREE & SHOW TREE IMAGE
+          this.timeline.addLabel("finish")
+          this.timeline.to(video, { currentTime: videoDur - 0.1, duration: 4, ease: "none" }, "finish")
+          // Fade in Tree Image at the end of the video movement
+          this.timeline.to(treeOverlay, { opacity: 1, duration: 1, ease: "none" }, "finish+=3")
+
+          // 8. SHOW FINAL SLOGAN
+          this.timeline.addLabel("slogan")
+          this.timeline.to(finalSlogan, { opacity: 1, y: 0, duration: 2, ease: "power2.out" }, "slogan")
+          
+          // Hold for a moment
+          this.timeline.to({}, { duration: 2 })
+
+          // Force refresh after creation
+          ScrollTrigger.refresh()
+          
+          // Check if we need to scroll to services initially
+          if (this.route.hash === '#services') {
+              // Small delay to ensure everything is ready
+              setTimeout(() => {
+                  this.scrollToServices()
+              }, 100)
+          }
+      }, 100)
     },
     scrollToServices() {
         if (!this.timeline) return
